@@ -1,0 +1,245 @@
+\documentclass{beamer}
+\usetheme{umbc4}    
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\include{samdefs}
+
+\usepackage{tikz,tkz-berge}
+\setbeamertemplate{background canvas}[vertical shading][bottom=green!20,top=yellow!30]
+
+\title[CODS, Mar. 16, 2016] % (optional, use only with long paper titles)
+{Fast Detection of Near Duplicates}
+
+\author{Sambuddha Roy, LinkedIn}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{The duplicate detection problem.}
+\begin{itemize}
+\item Why are duplicates problematic? 
+\pause
+\item Imagine if...
+\pause
+\item Youtube had multiple copies of each video!
+\begin{itemize}
+\item Someone copies the cat video that \textit{you} uploaded!
+\end{itemize}
+\pause
+\item Duplicate content confuses search engines.
+\begin{itemize}
+\item What happens to the pageRank of the page?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How do you catch duplicates?}
+\begin{itemize}
+\item Some form of hashing...
+\item Different items go to different hashes (collision resistant).
+\item Group by hashes - each group corresponds to a distinct element.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How about near-duplicates?}
+\begin{itemize}
+\item Now imagine if...
+\pause
+\item Someone made a profile on Facebook, very similar to yours. 
+\item copied profile pictures, \pause connected to the same friends, \pause indicated same interests \pause etc.
+\pause 
+\item Identity theft!
+\pause
+\item Other use cases: plagiarism, etc. 
+\color{blue} Here, put in a picture of "spot the difference"
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Essential Problem: Nearest Neighbor Search}
+\begin{itemize}
+\item There is a database of items $\cal{D}$. 
+\item ...and a query $q$ arrives. 
+\pause
+\item Given the query $q$, find the nearest neighbors of $q$ in the database $\cal{D}$. 
+\pause
+\item Often, we just want the $k$ nearest neighbors (k-NN problem).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nearness?}
+\begin{itemize}
+\item Nearness only makes sense in the presence of a {\em distance measure}.
+\pause 
+\item So, similarity measures between objects/items...
+\item i.e. {\em featurize} items \pause as vectors $\in \mathbb{R}^n$ or in $\{0, 1\}^n$. 
+\pause
+\item And consider some distance/similarity measure between these vectors. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Typical Distance/Similarity Measures}
+\begin{itemize}
+\item Jaccard similarity: $J(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+\pause
+\item Cosine Similarity etc.: $\si(a, b) = \frac{a \cdot b}{|a||b|}$
+\pause
+\item Hamming Distance
+\item Tanimoto distance
+\pause
+\item It's typical to relate the distance and similarity measures as $\dist(a, b) = 1 -\si(a, b)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Back to what we want...}
+\begin{itemize}
+\item Given a \textcolor{red}{\em query} object $q$, we would want to retrieve all the \textcolor{green}{\em database} items that are ``similar'' to $q$.
+\pause
+\item A search by pairwise comparisons between $q$ and all the items in the database may become too costly.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{And the situation becomes even worse...}
+\begin{itemize}
+\item If we want to ``cluster'' the items in the database according to their similarities/distances. 
+\pause 
+\item (Aside: what does this even mean? It may be for a threshold $\tau$ and points $a, b, c$ that $\dist(a, b) \leqs \kappa$ and $\dist(b, c) \leqs \kappa$ but $\dist(a, c) > \kappa$ i.e. similarity is not ``transitive'').
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Similarity is not transitive}
+\begin{itemize}
+\item A more meaningful formulation can be: we want \tcb{all} {\em pairs} of items $a, b$ such that $\si(a, b)\geqs \tau$ for some $\tau \in [0, 1]$ (sufficiently similar items).
+\pause
+\item If we make $\tau = 0$ we are asking for all pairs of items; this would involve all of the $\binom{n}{2}$ number of pairs (for $n$ items in the database).
+\pause
+\item Imagine if the number of items $n$ were \pause $1$ million... \pause $1$ billion...!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternate Formulation/Relaxations}
+\begin{itemize}
+\item We really do not want all pairs for $\tau$ really small; in fact, typical use-cases will consider $\tau > 0.8$ or so (sufficiently similar).
+\item Let's also relax the \tcb{all} in the above too; replace that by \tcr{most}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Refining what we want}
+\begin{itemize}
+\item Find near-duplicates of query items.
+\item Some mistakes will be allowed (both false positives, false negatives). 
+\item Time! Querying should be \tcg{fast}. The clustering variant should take $O(n)$ time instead of $O(n^2)$. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Hashing to the rescue}
+\begin{itemize}
+\item Can we hash items so that ``nearby'' items are in \tcr{same} hash-buckets?
+\item Note that this is counter to the usual notion of hashing, where collisions are taboo. 
+\item Here, we would like collisions - but only between {\em nearby} items.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Enter $\lsh$}
+\begin{itemize}
+\item Locality Sensitive Hashing - introduced by Indyk \& Motwani, in 1998. 
+\begin{itemize}
+\item Introduced concept
+\item exhibited $\lsh$ for Hamming Distance.
+\end{itemize}
+\pause
+\item MinHash - by Broder, Charikar, Frieze, Mitzenmacher, 1998.
+\begin{itemize}
+\item Introduced min-wise permutations.
+\item $\lsh$ for Jaccard similarity.
+\end{itemize}\pause
+\item SimHash - by Charikar, 2002. 
+\begin{itemize}
+\item Demonstrated connections between randomized rounding and $\lsh$
+\item $\lsh$ for cosine similarity (angular distance).
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formal definition of $\lsh$}
+\begin{itemize}
+\item A hash is said to be a $(S, cS, p_1, p_2)$-$\lsh$ for a similarity function $\si$ over spaces 
+$\cal{X}, \cal{Y}\subseteq \cal{Z}$ if for any $x\in\mathcal{X}, y\in\mathcal{Y}$:
+\begin{itemize}
+\item if $\si(x, y)\geqs S$ then $\Pr[h(x)=h(y)]\geqs p_1$.
+\item if $\si(x, y)\leqs cS$ then $\Pr[h(x)=h(y)]\leqs p_2$.
+\end{itemize}
+Here, $c \in (0, 1)$ \pause
+\item Read as: items that are ``highly'' similar land in the \tcb{same} hash-bucket with ``high'' probability, and items that are dissimilar land in the same hash bucket with ``low'' probability.
+\item Ideally we want: $p_1 = 1$, and $p_2 = 0$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Still a flourishing area...}
+\begin{itemize}
+\item Improve \textit{recall} of $\lsh$: 
+\begin{itemize}
+\item covering $\lsh$ (only for Hamming space),
+\item other similarity measures wide open.
+\end{itemize} 
+\item Develop $\lsh$'s for other similarity measures.
+\begin{itemize}
+\item Inner product 
+\item Also gave rise to Assymetric $\lsh$.
+\end{itemize}
+\item Improve training and query times:
+\begin{itemize}
+\item Data Dependent Hashing
+\end{itemize}
+\item Hash based on data:
+\begin{itemize}
+\item Learning to hash
+\item Data dependent hashing.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+\item 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Thank You!
+\end{center}
+\end{frame}
+
+\end{document} 
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{frame}
