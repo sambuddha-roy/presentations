@@ -97,7 +97,8 @@
 \item Cosine Similarity etc.: $\si(a, b) = \frac{a \cdot b}{|a||b|}$
 \pause
 \item Hamming Distance
-\item Tanimoto distance
+\item $\ell_p$ for $p \in \left[0, 2\right]$.
+\item Tanimoto distance, Mahalanobis distance, etc. 
 \pause
 \item It's typical to relate the distance and similarity measures as $\dist(a, b) = 1 -\si(a, b)$.
 \end{itemize}
@@ -114,7 +115,7 @@
 
 
 \begin{frame}
-\frametitle{And the situation becomes even worse...}
+\frametitle{Another use-case...}
 \begin{itemize}
 \item If we want to ``cluster'' the items in the database according to their similarities/distances. 
 \pause 
@@ -136,7 +137,7 @@
 \begin{frame}
 \frametitle{Alternate Formulation/Relaxations}
 \begin{itemize}
-\item We really do not want all pairs for $\tau$ really small; in fact, typical use-cases will consider $\tau > 0.8$ or so (sufficiently similar).
+\item We really do not want \tcb{all} pairs for $\tau$ really small; in fact, typical use-cases will consider $\tau > 0.8$ or so (sufficiently similar).
 \item Let's also relax the \tcb{all} in the above too; replace that by \tcr{most}.
 \end{itemize}
 \end{frame}
@@ -183,23 +184,176 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Formal definition of $\lsh$}
+\frametitle{(Slight) Reformulation}
 \begin{itemize}
-\item A hash is said to be a $(S, cS, p_1, p_2)$-$\lsh$ for a similarity function $\si$ over spaces 
-$\cal{X}, \cal{Y}\subseteq \cal{Z}$ if for any $x\in\mathcal{X}, y\in\mathcal{Y}$:
-\begin{itemize}
-\item if $\si(x, y)\geqs S$ then $\Pr[h(x)=h(y)]\geqs p_1$.
-\item if $\si(x, y)\leqs cS$ then $\Pr[h(x)=h(y)]\leqs p_2$.
-\end{itemize}
-Here, $c \in (0, 1)$ \pause
+\item A family of hash functions $\mathcal{F}$ is a $\lsh$ if $\Pr_{h\in\mathcal{F}}\left[h(x)=h(y)\right] = \si(x, y)$.
 \item Read as: items that are ``highly'' similar land in the \tcb{same} hash-bucket with ``high'' probability, and items that are dissimilar land in the same hash bucket with ``low'' probability.
-\item Ideally we want: $p_1 = 1$, and $p_2 = 0$.
 \end{itemize}
 \end{frame}
 
 \begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig1}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig1}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig2}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig3}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item This random hyperplane is a hash function $h: \mathbb{R}^n \rightarrow \{0, 1\}$. 
+\item It maps a vector $v$ to $\{0, 1\}$, depending on whether the vector $v$ is to the top/bottom of the hyperplane (essentially, checking for the sign of the inner product).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Probability calculation}
+\begin{itemize}
+\item Probability that vectors $a, b$ map to the same output, i.e. $\Pr\left[h(a) = h(b)\right]$?
+\pause
+\item If $\theta$ be the angle between $a, b$, then this equals $\left[1 - \frac{\theta}{\pi}\right]$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall?}
+\begin{itemize}
+\item With a single hash function $h$, the precision may be quite low; the recall quite high. 
+\item Just one hash may not be able to detect vectors that are indeed close by. So...
+\pause
+\item Several (independent) copies of the hash function $h$; call these $h_1, h_2, \cdots, h_k$.  
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall?}
+\begin{itemize}
+\item With $k$ hash functions, we have a $k$-bit binary string, corresponding to a vector $v$.
+\item Call this the \textit{hashcode} corresponding to the vector $v$ (denoted as $\hc(v)$). 
+\item For two vectors $a, b$: if $\hc(a) = \hc(b)$ bit-by-bit, then surely $a$ and $b$ are close. 
+\pause
+\item This would help in improving precision. But recall may suffer.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall? Two extremes}
+\begin{itemize}
+\item Given the hashcodes of the vectors, we can ask for a full bit-by-bit match to declare near duplicates. High precision, low recall.
+\item Given the hashcodes, we can ask for a \textit{single} bit match to declare near duplicates. High recall, low precision.
+\pause
+\item Mix the two: Banding. In the parlance of complexity theory, \tcr{gap amplification}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig4}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig5}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig6}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig7}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig8}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig9}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
 \frametitle{Still a flourishing area...}
 \begin{itemize}
+\item Various considerations:
+\begin{itemize}
+\item Factors to consider: hash table construction time, query times, etc. 
+\item How much randomness do I need?
+\item How do I improve recall while maintaining precision.
+\item Deep Hashing techniques?
+\end{itemize}
 \item Improve \textit{recall} of $\lsh$: 
 \begin{itemize}
 \item covering $\lsh$ (only for Hamming space),
@@ -210,14 +364,10 @@ Here, $c \in (0, 1)$ \pause
 \item Inner product 
 \item Also gave rise to Assymetric $\lsh$.
 \end{itemize}
-\item Improve training and query times:
+\item Improve training and query times based on data:
 \begin{itemize}
 \item Data Dependent Hashing
-\end{itemize}
-\item Hash based on data:
-\begin{itemize}
 \item Learning to hash
-\item Data dependent hashing.
 \end{itemize}
 \end{itemize}
 \end{frame}
@@ -233,6 +383,21 @@ Here, $c \in (0, 1)$ \pause
 \begin{center}
 Thank You!
 \end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formal definition of $\lsh$}
+\begin{itemize}
+\item A hash is said to be a $(S, cS, p_1, p_2)$-$\lsh$ for a similarity function $\si$ over the space 
+$\mathcal{X}$ if for any $x, y\in\mathcal{X}$:
+\begin{itemize}
+\item if $\si(x, y)\geqs S$ then $\Pr[h(x)=h(y)]\geqs p_1$.
+\item if $\si(x, y)\leqs cS$ then $\Pr[h(x)=h(y)]\leqs p_2$.
+\end{itemize}
+Here, $c \in (0, 1)$ \pause
+\item Read as: items that are ``highly'' similar land in the \tcb{same} hash-bucket with ``high'' probability, and items that are dissimilar land in the same hash bucket with ``low'' probability.
+\item Ideally we want: $p_1 = 1$, and $p_2 = 0$. These probabilities ``mirror'' the similarity function $\si(\cdot, \cdot)$.
+\end{itemize}
 \end{frame}
 
 \end{document} 
