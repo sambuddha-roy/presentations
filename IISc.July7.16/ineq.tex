@@ -125,7 +125,7 @@ $\sum_{v\in V_1} d(v) \geqs |A|/3$.
 \item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
 \item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
 \end{itemize}
-\item Rewrite the {\color{blue} blue} inequality above as {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} = |A|$}. 
+\item Rewrite the {\color{blue} blue} equality above as {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} = |A|$}. 
 \item From here, we want to get: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
 \end{itemize}
 \end{frame}
@@ -142,7 +142,9 @@ $\sum_{v\in V_1} d(v) \geqs |A|/3$.
 \item Have: {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} 
 = |A|$}
 \item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
+\pause
 \item Separate out the vertices as $v\in V_1$ and $v\in V\backslash V_1$. 
+\pause
 \item For $v \in V \backslash V_1$, $i(v)/d(v) < 1/3$. For $v \in V_1$, $i(v)/d(v) \leqs 1$. 
 \item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) + \sum_{v\in V\backslash V_1} d(v)/3$}
 \end{itemize}
@@ -208,7 +210,20 @@ will satisfy $i(v) \geqs d(v)/3$?
 \item Chebyshev Inequalities
 \item Markov Inequalities
 \item Chernoff-Hoeffding bounds.
+\item Talagrand Inequality
 \end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Example: Chebyshev's Inequality}
+Recall Chebyshev's inequality: 
+\begin{itemize}
+\item Setting: let $X$ be a random variable with $E(X)= \mu$ and variance $\sigma^2 = var(X)$. 
+\item Then: $P( | X - \mu | \geqs t ) \leqs \frac{\sigma^2}{t^2}$
+\end{itemize}
+
+\pause How do we prove it?
+\pause How do we prove Markov's Inequality?
 \end{frame}
 
 \begin{frame}
@@ -247,13 +262,6 @@ $P( X - \mu \geqs t ) \leqs \frac{\sigma^2}{\sigma^2 + t^2}$.
 \end{itemize}
 \end{frame}
 
-\begin{frame}
-\frametitle{Lagrangian Relaxations}
-\begin{itemize}
-\item The big idea behind Lagrangian Relaxations is to ``relax'' the hard constraints by
-{\em pulling them} into the objective. 
-\end{itemize}
-\end{frame}
 
 \begin{frame}
 \frametitle{An example}
@@ -271,17 +279,28 @@ Looks familiar?
 
 \begin{frame}
 \frametitle{Example modified}
-Modified optimization problem:
+Modified Vertex Cover problem where we have to cover at least $k$ edges (the so-called 
+``partial vertex cover'' problem):
+\pause
 \[ 
 \min \sum_{i\in V} c_i x_i 
 \]
 \begin{eqnarray*}
-\forall{(i, j) \in E} & {\color{blue} x_i + x_j \geqs 1}&\\
-& {\color{red} \sum_{i \in V} x_i \geqs  k}&\\
-\forall{i \in V} & x_i \geqs 0&
+\forall{(i, j) \in E} & {\color{blue} x_i + x_j \geqs y_e}&\\
+& {\color{red} \sum_{e \in E} y_e \geqs  k}&\\
+\forall{i \in V} & 1 \geqs x_i \geqs 0&
 \end{eqnarray*}
-Here, the {\color{blue} $x_i + x_j \geqs 1$} are the ``soft'' constraints, and 
-{\color{red} $\sum_{i \in V} x_i \geqs  k$} is the ``hard'' constraint. 
+Here, the {\color{blue} $x_i + x_j \geqs y_e$} are the ``soft'' constraints, and 
+{\color{red} $\sum_{e \in E} y_e \geqs  k$} is the ``hard'' constraint. 
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Lagrangian Relaxations}
+\begin{itemize}
+\item The big idea behind Lagrangian Relaxations is to ``relax'' the hard constraints by
+{\em pulling them} into the objective. 
+\end{itemize}
 \end{frame}
 
 \begin{frame}
@@ -489,10 +508,15 @@ inequality!
 \end{frame}
 
 \begin{frame}
-\frametitle{Final Challenge: Quiz Problem $3$}
+\frametitle{Final Challenge: Quiz Problem $4$}
 \bf{Carleman's Inequality}:
 \begin{center}
 $\sum_{k=1}^{\infty} (a_1 a_2 \cdots a_k)^{1/k} \leqs e \sum_{k=1}^{\infty} a_k$.
+\end{center}
+\pause
+Or... \pause prove that:
+\begin{center}
+$3(a^2 + b^2 + c^2) \geqs (a + b + c)^2$
 \end{center}
 \end{frame}
 
