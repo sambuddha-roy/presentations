@@ -111,7 +111,7 @@ Let $V_1 = \{v : i(v) \geqs d(v)/3\}$
 \end{itemize}
 \item Required to prove that: 
 \begin{center}
-$\sum_{v\in V_1} d(v) \geqs |A|/2$. 
+$\sum_{v\in V_1} d(v) \geqs |A|/3$. 
 \end{center}
 \end{itemize}
 \end{frame}
@@ -126,7 +126,7 @@ $\sum_{v\in V_1} d(v) \geqs |A|/2$.
 \item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
 \end{itemize}
 \item Rewrite the {\color{blue} blue} inequality above as {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} = |A|$}. 
-\item From here, we want to get: $\sum_{v\in V_1} d(v) \geqs |A|/2$.
+\item From here, we want to get: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
 \end{itemize}
 \end{frame}
 
@@ -139,26 +139,360 @@ $\sum_{v\in V_1} d(v) \geqs |A|/2$.
 \end{itemize}
 \end{block}
 \begin{itemize}
-%\item Facts:
-%\begin{itemize}
-%\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
-%\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
-%\end{itemize}
 \item Have: {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} 
 = |A|$}
-\item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/2$.
+\item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
 \item Separate out the vertices as $v\in V_1$ and $v\in V\backslash V_1$. 
 \item For $v \in V \backslash V_1$, $i(v)/d(v) < 1/3$. For $v \in V_1$, $i(v)/d(v) \leqs 1$. 
 \item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) + \sum_{v\in V\backslash V_1} d(v)/3$}
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+\frametitle{Inequality $2$: Use {\color{red} red} fact}
+\begin{block}{Facts}
+\begin{itemize}
+\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
+\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+\end{itemize}
+\end{block}
+\begin{itemize}
+\item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) +$}{\color{red}$ \sum_{v\in V\backslash V_1} d(v)/3$}
+\item i.e. $|A| \leqs \sum_{v \in V_1} d(v) + {\color{red} \frac{2|A|}{3}}$, which gives
+\item $\sum_{v \in V_1} d(v) \geqs \frac{|A|}{3}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inequality $2$: Quiz Problem $1$ (Extra Credit) }
+\begin{itemize}
+\item We showed: 
+\begin{center}
+$\sum_{v \in V_1} d(v) \geqs |A|/3$.
+\end{center}
+\pause
+\item Instead show that: 
+\begin{center}
+$\sum_{v \in V_1} d(v) \geqs |A|/{\color{red} 2}$. 
+\end{center}
+\end{itemize}
+\end{frame}
 
 
+\begin{frame}
+\frametitle{Inequality $2$: Quiz Problem $1$ (Bonus Credit)}
+\begin{itemize}
+\item Show that: 
+\begin{center}
+$\sum_{v \in V_1} d(v) \geqs |A|$
+\end{center}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Comments}
+\begin{itemize}
+\item Why is this a ``concentration of measure'' result?
+\item Note that $\sum_{v \in V} d(v) = 2\sum_{v \in V} i(v)$, so {\em on average}
+$i(v)$ is roughly {\color{red} half} of $d(v)$. 
+\item As before, we move slightly away from the mean and ask: how many vertices $v$
+will satisfy $i(v) \geqs d(v)/3$? 
+\item While we don't get a {\em count}, we get a result for the {\em mass}. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Concentration of measure}
+\begin{itemize}
+\item Chebyshev Inequalities
+\item Markov Inequalities
+\item Chernoff-Hoeffding bounds.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Quiz Problem $2$}
+\begin{itemize}
+\item Recall Chebyshev's inequality: 
+\begin{itemize}
+\item Setting: let $X$ be a random variable with $E(X)= \mu$ and variance $\sigma^2 = var(X)$. 
+\item Then: $P( | X - \mu | \geqs t ) \leqs \frac{\sigma^2}{t^2}$
+\pause
+\item Question: A one-sided version of Chebyshev
+\pause
+\item Prove that: 
+\begin{center}
+{\color{red}
+$P( X - \mu \geqs t ) \leqs \frac{\sigma^2}{\sigma^2 + t^2}$. 
+}
+\end{center}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Shifting Gears: Lagrangian Relaxations}
+\begin{itemize}
+\item Suppose we are given an optimization problem. 
+\item What is an optimization problem? 
+\begin{itemize}
+\item Has an {\color{red} objective}
+\item Has {\color{blue} constraints}
+\end{itemize}
+\pause
+\item Some constraints are easy to satisfy \pause (called ``soft'' constraints)
+\pause 
+\item while some others are harder - hard constraints. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Lagrangian Relaxations}
+\begin{itemize}
+\item The big idea behind Lagrangian Relaxations is to ``relax'' the hard constraints by
+{\em pulling them} into the objective. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{An example}
+An optimization problem:
+\[ 
+\min \sum_{i\in V} c_i x_i 
+\]
+\begin{eqnarray*}
+\forall{(i, j) \in E} & {\color{blue} x_i + x_j \geqs 1}&\\
+\forall{i \in V} & x_i \geqs 0&
+\end{eqnarray*}
+
+Looks familiar?
+\end{frame}
+
+\begin{frame}
+\frametitle{Example modified}
+Modified optimization problem:
+\[ 
+\min \sum_{i\in V} c_i x_i 
+\]
+\begin{eqnarray*}
+\forall{(i, j) \in E} & {\color{blue} x_i + x_j \geqs 1}&\\
+& {\color{red} \sum_{i \in V} x_i \geqs  k}&\\
+\forall{i \in V} & x_i \geqs 0&
+\end{eqnarray*}
+Here, the {\color{blue} $x_i + x_j \geqs 1$} are the ``soft'' constraints, and 
+{\color{red} $\sum_{i \in V} x_i \geqs  k$} is the ``hard'' constraint. 
+\end{frame}
+
+\begin{frame}
+\frametitle{General Instance}
+Optimization problem $O_1$:
+\[ 
+\min f(x)
+\]
+\begin{eqnarray*}
+\mathrm{s.t.} &&\\
+&{\color{blue} s(x) \leqs 0}&\\
+&{\color{red} h(x) \leqs 0}&
+\end{eqnarray*}
+where, $s(x)$ stands for the soft constraints, and $h(x)$ for the hard constraints.
+\end{frame}
+
+\begin{frame}
+\frametitle{Lagrangian Relaxation}
+Relaxation $O_2 = \lr(\lambda)$ of $O_1$:
+\[ 
+\min f(x) + \lambda\cdot{\color{red} h(x)}
+\]
+\begin{eqnarray*}
+\mathrm{s.t.} &&\\
+&{\color{blue} s(x) \leqs 0}&\\
+&\lambda \geqs 0&
+\end{eqnarray*}
+Here, $\lambda  \in [0, \infty)$ is called a {\color{blue} Lagrange Multiplier}. 
+\begin{center}
+Major Impact: ${\color{red} \mathbf{\lr(\lambda) \leqs O_1}}$!!!
+%$\mathrm{Major Impact:} {\color{red} \mathbf{$\lr(\lambda) \leqs O_1}}$
+\end{center}
+\end{frame}
+
+\begin{frame} 
+\frametitle{H\"{o}lder's Inequality}
+Setting: 
+\begin{itemize}
+\item
+Vectors $\mathbf{x}= (x_1, \cdots, x_n), \mathbf{y} = (y_1, \cdots, y_n)$, where
+$\mathbf{x}, \mathbf{y} \in \mathbb{R}^{n}_{\geqs 0}$.
+\item Reals $p, q \in \mathbb{R}$ such that $\frac{1}{p} + \frac{1}{q} = 1$. 
+\end{itemize}
+Prove that:
+\begin{center}
+$(x_1^p + x_2^p + \cdots + x_n^p)^{1/p} \cdot (y_1^q + y_2^q + \cdots y_n^q)^{1/q} \geqs \mathbf{x}\cdot\mathbf{y}$
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{H\"{o}lder's Inequality}
+Have we seen (any special case of) this before?
+With $p = q = 2$: 
+\begin{center}
+$(x_1^2 + x_2^2 + \cdots + x_n^2)^{1/2} \cdot (y_1^2 + y_2^2 + \cdots y_n^2)^{1/2} \geqs \mathbf{x}\cdot\mathbf{y}$
+\end{center}
+which is the Cauchy Schwarz inequality!
+\end{frame}
+
+\begin{frame}
+\frametitle{Another H\"{o}lder's Inequality}
+The following is also often called H\"{o}lder's Inequality (same conditions on $p, q$, non-negative
+real numbers $x, y$):
+\begin{center}
+$\frac{x^p}{p} + \frac{y^q}{q} \geqs x y$
+\end{center}
+Proof is easy by $\mathrm{AM-GM}$. (Quiz Problem $3$). 
+Call this the ``little'' H\"{o}lder's Inequality.
+Condition for equality: $x^p = y^q$.
+
+Now, from here to the first H\"{o}lder's Inequality? We will only discuss $n = 2$. 
+\end{frame}
+
+\begin{frame}
+\frametitle{$n = 2$}
+We want: 
+\begin{center}
+$(x_1^p + x_2^p)^{1/p}\cdot (y_1^q + y_2^q)^{1/q} \geqs \mathbf{x}\cdot \mathbf{y}$
+\end{center}
+First attempt: 
+We can write down $2$ ``little'' H\"{o}lder Inequalities (one for $x_1, y_1$ another for $x_2, y_2$)
+but that gives us:
+\begin{center}
+$\frac{x_1^p + x_2^p}{p}+\frac{y_1^q + y_2^q}{q} \geqs \mathbf{x}\cdot \mathbf{y}$
+\end{center}
+This is {\color{red} weaker} than what we want; why?
+\end{frame}
+
+\begin{frame}
+\frametitle{Weaker?}
+So far, we have:
+\begin{center}
+$\frac{x_1^p + x_2^p}{p}+\frac{y_1^q + y_2^q}{q} \geqs \mathbf{x}\cdot \mathbf{y}$
+\end{center}
+Let $z_1^p = x_1^p + x_2^p$ and $z_2^q = y_1^q + y_2^q$, then one application of the 
+``little'' H\"{o}lder Inequality gives:
+\begin{center}
+$\frac{x_1^p + x_2^p}{p}+\frac{y_1^q + y_2^q}{q} \geqs z_1 \cdot z_2 = (x_1^p + x_2^p)^{1/p}\cdot (y_1^q + y_2^q)^{1/q}$
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Weaker to Stronger}
+Terry Tao's suggestion: in order to milk most out of an inequality, apply it to a scenario where equality can
+even conceivably hold. 
+
+Also called the ``principle of maximum effectiveness''.
+
+We realize that for the application of the ``little'' H\"{o}lder Inequality above, 
+the equality condition of $x_1^p + x_2^p = y_1^q + y_2^q$ may be widely flouted. 
+\end{frame}
+
+\begin{frame}
+\frametitle{Enter Lagrangian Multipliers}
+
+Taking the cue from there, let's apply a Lagrangian Multiplier $\lambda$:
+\begin{center} 
+$\frac{x_1^p + x_2^p}{p}+{\color{blue}\lambda^q}\frac{y_1^q + y_2^q}{q} \geqs {\color{blue}\lambda}\mathbf{x}\cdot \mathbf{y}$
+\end{center}
+
+Now we can at least hope to achieve the case of equality by suitably choosing $\lambda = \lambda_0$.
+\pause
+\begin{center} 
+$\lambda_0^q = \frac{x_1^p + x_2^p}{y_1^q + y_2^q}$
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Enter Lagrangian Multipliers}
+\begin{center} 
+${\color{blue}\frac{x_1^p + x_2^p}{p}+{\color{blue}\lambda^q}\frac{y_1^q + y_2^q}{q}} \geqs {\color{blue}\lambda}\mathbf{x}\cdot \mathbf{y}$
+\end{center}
+\begin{center}
+$\lambda_0^q = \frac{x_1^p + x_2^p}{y_1^q + y_2^q}$
+\end{center}
+Applying $1/p + 1/q = 1$, 
+the LHS ${\color{blue}\frac{x_1^p + x_2^p}{p}+{\color{blue}\lambda_0^q}\frac{y_1^q + y_2^q}{q}}$ simplifies to 
+$(x_1^p + x_2^p)$ and we have: $(x_1^p + x_2^p) \geqs \lambda_0 \mathbf{x}\cdot \mathbf{y}$.
+\end{frame}
+
+\begin{frame}
+\frametitle{Enter Lagrangian Multipliers}
+The LHS ${\color{blue}\frac{x_1^p + x_2^p}{p}+{\color{blue}\lambda_0^q}\frac{y_1^q + y_2^q}{q}}$ simplifies to$(x_1^p + x_2^p)$ and we have: $(x_1^p + x_2^p) \geqs \lambda_0 \mathbf{x}\cdot \mathbf{y}$.
+
+One last application of $1/p + 1/q = 1$ gives 
+\begin{center}
+$(x_1^p + x_2^p)^{1/p}\cdot (y_1^q + y_2^q)^{1/q} \geqs \mathbf{x}\cdot \mathbf{y}$
+\end{center}
+and we are done!
+\pause
+
+The inequality for $n$ quantities is similar.
+\end{frame}
+
+\begin{frame}
+\frametitle{Ode to beautiful inequalities}
+The world of inequalities is mesmerizing:
+\begin{itemize}
+\item 
+The mother of all inequalities: Cauchy Schwarz Inequality
+$(x_1^2 + x_2^2 + \cdots + x_n^2)^{1/2}(y_1^2 + y_2^2 + \cdots y_n^2)^{1/2} \geqs \mathbf{x}\cdot\mathbf{y}$.
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{cauchySchwarzMasterClass.jpeg}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ode to beautiful inequalities}
+Sample applications:
+\begin{enumerate}
+\item $(x^2 + y^2 + z^2) \geqs (xy + yz + zx)$; restatement (AM-GM for $3$ numbers): $x^3 + y^3 + z^3 \geqs 3xyz$.
+\item Loomis-Whitney Inequality: Compares the volume of a set in terms of the volumes of the projections of that 
+set onto lower dimensional subspaces. 
+
+For $3$ dimensions: given a set $A \in \mathbb{R}^3$ and its projections onto the axes $A_x, A_y, A_z$ it holds that:
+\begin{center}
+$|A| \leqs |A_x|^{1/2}|A_y|^{1/2}|A_z|^{1/2}$
+\end{center}
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ode to beautiful inequalities}
+\begin{enumerate}
+\item Harker-Kasper Inequality in Crystallography
+\pause
+\item Cram\'{e}r-Rao Lower Bound in Statistics
+\pause
+\item Jensen's Inequality in Convex Analysis, Expectation Maximization methods.
+\pause
+\item Many, many, many more...
+\end{enumerate}
+\end{frame}
+
+\begin{frame}
+\frametitle{And more...}
+\bf{Carleman's Inequality}:
+\begin{center}
+$\sum_{k=1}^{\infty} (a_1 a_2 \cdots a_k)^{1/k} \leqs e \sum_{k=1}^{\infty} a_k$.
+\end{center}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+{\bf THANK YOU}
+\end{center}
+\end{frame}
 
 
 \end{document} 
-
 
 
 \begin{frame}
