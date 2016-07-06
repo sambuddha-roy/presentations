@@ -1,0 +1,169 @@
+\documentclass{beamer}
+\usetheme{umbc4}    
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage{color}
+\include{samdefs}
+
+\usepackage{tikz,tkz-berge}
+\setbeamertemplate{background canvas}[vertical shading][bottom=green!20,top=yellow!30]
+\setbeamertemplate{itemize item}{\scriptsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+
+
+\title[IISc., July 7, 2016] % (optional, use only with long paper titles)
+{Common Inequalities in Computer Science}
+
+\author{Sambuddha Roy, LinkedIn}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Contents}
+\begin{itemize}
+\item Why inequalities?
+\item Used in: almost everywhere..
+\pause
+\begin{itemize}
+\item Approximation Algorithms \pause 
+\item Optimization \pause
+\item Machine Learning \pause
+\item Mathematical Analysis \pause
+\item ...
+\pause
+\item (Can almost be called the backbone of mathematics..)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{See it in real life}
+\begin{itemize}
+\item So you have an algorithm - how do you prove it to be optimal (or close to optimal)?
+\pause
+\item You have to show that there is a {\em lower bound} for the resources that the algorithm 
+takes.
+\pause
+\item Essentially - prove inequalities!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A simple inequality}
+\begin{itemize}
+\item Setting: We are given $n$ positive real numbers $x_1, x_2, \cdots x_n$, such that:
+$x_1 + x_2 + \cdots + x_n \geqs n$. 
+\item Prove: $\sum_{i: x_i > 1/2} x_i \geqs n/2$. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A simple inequality}
+\begin{itemize}
+\item 
+Break up the sum $x_1 + x_2 + \cdots + x_n$ into two parts, collecting all terms $i$ such that $x_i > 1/2$ and 
+terms $i$ such that $x_i \leqs 1/2$.
+\begin{center}
+$\sum_i x_i = \sum_{i: x_i \leqs 1/2} x_i + \sum_{i: x_i > 1/2} x_i$
+\end{center}
+\item 
+Let $k$ denote the number of terms such that $x_i \leqs 1/2$, so that:
+\begin{center}
+$ n \leqs \sum_i x_i \leqs k/2 + \sum_{i: x_i > 1/2} x_i$
+\end{center}
+\pause
+\item So that: $\sum_{i: x_i > 1/2} x_i \geqs (n - k/2) \geqs n/2$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{A simple inequality: Summary}
+\begin{itemize}
+\item Given the $n$ numbers, the {\color{red} mean} is $\geqs 1$. 
+\item Maybe very few numbers have $x_i \approx 1$ $\cdots$ but \pause
+\item Most of the {\color{blue} mass} is {\em around} $1$:
+\begin{center}
+$\sum_{i: x_i > 1/2} x_i \geqs n/2$
+\end{center}
+\pause
+\item A concentration of measure result. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inequality $2$}
+\begin{itemize}
+\item Setting: 
+\begin{itemize}
+\item
+We are given a {\em digraph} $D = (V, A)$. 
+\item 
+Given a vertex $v$, let $i(v)$ denote the 
+indegree of the vertex, and let $d(v)$ denote the total degree (in + out). 
+\item 
+Let $V_1 = \{v : i(v) \geqs d(v)/3\}$
+\end{itemize}
+\item Required to prove that: 
+\begin{center}
+$\sum_{v\in V_1} d(v) \geqs |A|/2$. 
+\end{center}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inequality $2$}
+\begin{itemize}
+\item Another application of concentration of measure.
+\item Collect facts:
+\begin{itemize}
+\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
+\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+\end{itemize}
+\item Rewrite the {\color{blue} blue} inequality above as {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} = |A|$}. 
+\item From here, we want to get: $\sum_{v\in V_1} d(v) \geqs |A|/2$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Inequality $2$: Use {\color{blue} blue} fact}
+\begin{block}{Facts}
+\begin{itemize}
+\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
+\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+\end{itemize}
+\end{block}
+\begin{itemize}
+%\item Facts:
+%\begin{itemize}
+%\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
+%\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+%\end{itemize}
+\item Have: {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} 
+= |A|$}
+\item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/2$.
+\item Separate out the vertices as $v\in V_1$ and $v\in V\backslash V_1$. 
+\item For $v \in V \backslash V_1$, $i(v)/d(v) < 1/3$. For $v \in V_1$, $i(v)/d(v) \leqs 1$. 
+\item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) + \sum_{v\in V\backslash V_1} d(v)/3$}
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\end{document} 
+
+
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{frame}
