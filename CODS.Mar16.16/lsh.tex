@@ -1,0 +1,464 @@
+\documentclass{beamer}
+\usetheme{umbc4}    
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\include{samdefs}
+
+\usepackage{tikz,tkz-berge}
+\setbeamertemplate{background canvas}[vertical shading][bottom=green!20,top=yellow!30]
+
+\title[CODS, Mar. 16, 2016] % (optional, use only with long paper titles)
+{Fast Detection of Near Duplicates}
+
+\author{Sambuddha Roy, LinkedIn}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Motivation.}
+\begin{center}
+\includegraphics[width=0.5\textwidth,height=1.5in]{Memes/philo1}
+\includegraphics[width=0.5\textwidth, height=1.5in]{Memes/philo5}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{and some more...}
+\begin{center}
+\includegraphics[width=0.5\textwidth,height=1.5in]{Memes/philo6}
+\includegraphics[width=0.5\textwidth, height=1.5in]{Memes/philo7}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{and more...}
+\begin{center}
+\includegraphics[width=0.5\textwidth,height=1.5in]{Memes/philo3}
+\includegraphics[width=0.5\textwidth, height=1.5in]{Memes/philo4}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{The duplicate detection problem.}
+\begin{itemize}
+\item Why are duplicates problematic? 
+\pause
+\item Imagine if...
+\pause
+\item Youtube had multiple copies of each video!
+\begin{itemize}
+\item Someone copies the cat video that \textit{you} uploaded!
+\end{itemize}
+\pause
+\item Duplicate content confuses search engines.
+\begin{itemize}
+\item What happens to the pageRank of the page?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How do you catch duplicates?}
+\begin{itemize}
+\item Some form of hashing...
+\item Different items go to different hashes (collision resistant).
+\item Group by hashes - each group corresponds to a distinct element.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{How about near-duplicates?}
+\begin{itemize}
+\item Now imagine if...
+\pause
+\item Someone made a profile on Facebook, very similar to yours. 
+\item copied profile pictures, \pause connected to the same friends, \pause indicated same interests \pause etc.
+\pause 
+\item Identity theft!
+\pause
+\item Other use cases: plagiarism, etc. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Essential Problem: Nearest Neighbor Search}
+\begin{itemize}
+\item There is a database of items $\cal{D}$. 
+\item ...and a query $q$ arrives. 
+\pause
+\item Given the query $q$, find the nearest neighbors of $q$ in the database $\cal{D}$. 
+\pause
+\item Often, we just want the $k$ nearest neighbors (k-NN problem).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Nearness?}
+\begin{itemize}
+\item Nearness only makes sense in the presence of a {\em distance measure}.
+\pause 
+\item So, similarity measures between objects/items...
+\item i.e. {\em featurize} items \pause as vectors $\in \mathbb{R}^n$ or in $\{0, 1\}^n$. 
+\pause
+\item And consider some distance/similarity measure between these vectors. 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Typical Distance/Similarity Measures}
+\begin{itemize}
+\item Jaccard similarity: $J(A, B) = \frac{|A \cap B|}{|A \cup B|}$
+\pause
+\item Cosine Similarity etc.: $\si(a, b) = \frac{a \cdot b}{|a||b|}$
+\pause
+\item Hamming Distance
+\item $\ell_p$ for $p \in \left(0, 2\right]$.
+\item Tanimoto distance, Mahalanobis distance, etc. 
+\pause
+\item It's typical to relate the distance and similarity measures as $\dist(a, b) = 1 -\si(a, b)$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Back to what we want...}
+\begin{itemize}
+\item Given a \textcolor{red}{\em query} object $q$, we would want to retrieve all the \textcolor{green}{\em database} items that are ``similar'' to $q$.
+\pause
+\item A search by pairwise comparisons between $q$ and all the items in the database may become too costly.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Another use-case...}
+\begin{itemize}
+\item If we want to ``cluster'' the items in the database according to their similarities/distances. 
+\pause 
+\item (Aside: what does this even mean? It may be for a threshold $\tau$ and points $a, b, c$ that $\dist(a, b) \leqs \kappa$ and $\dist(b, c) \leqs \kappa$ but $\dist(a, c) > \kappa$ i.e. similarity is not ``transitive'').
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Similarity is not transitive}
+\begin{itemize}
+\item A more meaningful formulation can be: we want \tcb{all} {\em pairs} of items $a, b$ such that $\si(a, b)\geqs \tau$ for some $\tau \in [0, 1]$ (sufficiently similar items).
+\pause
+\item If we make $\tau = 0$ we are asking for all of the $\binom{n}{2}$ pairs of items (for $n$ items in the database).
+\pause
+\item Imagine if the number of items $n$ were \pause $1$ million... \pause $1$ billion...!
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Alternate Formulation/Relaxations}
+\begin{itemize}
+\item We really do not want \tcb{all} pairs for the similarity threshold, $\tau$ really small; in fact, typical use-cases will consider $\tau > 0.8$ or so (sufficiently similar).
+\item Let's also relax the \tcb{all} in the above too; replace that by \tcr{most}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Refining what we want}
+\begin{itemize}
+\item Find near-duplicates of query items.
+\item Some mistakes will be allowed (both false positives, false negatives). 
+\item Time! Querying should be \tcr{fast}. The clustering variant should take $O(n)$ time instead of $O(n^2)$. 
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Hashing to the rescue}
+\begin{itemize}
+\item Can we hash items so that ``nearby'' items are in \tcr{same} hash-buckets?
+\item Note that this is counter to the usual notion of hashing, where collisions are taboo. 
+\item Here, we would like collisions - but only between {\em nearby} items.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Enter $\lsh$}
+\begin{itemize}
+\item Locality Sensitive Hashing - introduced by Indyk \& Motwani, in 1998. 
+\begin{itemize}
+\item Introduced concept
+\item exhibited $\lsh$ for Hamming Distance.
+\end{itemize}
+\pause
+\item MinHash - by Broder, Charikar, Frieze, Mitzenmacher, 1998.
+\begin{itemize}
+\item Introduced min-wise permutations.
+\item $\lsh$ for Jaccard similarity.
+\end{itemize}\pause
+\item SimHash - by Charikar, 2002. 
+\begin{itemize}
+\item Demonstrated connections between randomized rounding and $\lsh$
+\item $\lsh$ for cosine similarity (angular distance).
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formal Definition}
+\begin{itemize}
+\item A family of hash functions $\mathcal{F}$ is a $\lsh$ if for \textit{any} $x, y$ the following holds:
+\begin{center}
+$\Pr_{h\in\mathcal{F}}\left[h(x)=h(y)\right] = \si(x, y)$
+\end{center}
+where $\si(x, y)$ is a similarity measure.
+\item Read as: items that are ``highly'' similar land in the \tcb{same} hash-bucket with ``high'' probability, and items that are dissimilar land in the same hash bucket with ``low'' probability.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig1}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig2}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item Given two vectors $a, b$, construct a hash function that maps these to the same bucket if the angle $\theta$ between them is {\em small}.
+\item Idea: use a random hyperplane (random projection).
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig3}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{$\lsh$ for angular distance}
+\begin{itemize}
+\item This random hyperplane is a hash function $h: \mathbb{R}^n \rightarrow \{0, 1\}$. 
+\item It maps a vector $v$ to $\{0, 1\}$, depending on whether the vector $v$ is to the top/bottom of the hyperplane (essentially, checking for the sign of the inner product).
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Probability calculation}
+\begin{itemize}
+\item Probability that vectors $a, b$ map to the same output, i.e. $\Pr\left[h(a) = h(b)\right]$?
+\begin{center}
+\includegraphics[height=1.5in]{fig3}
+\end{center}
+\pause
+\item If $\theta$ be the angle between $a, b$, then this equals $\left[1 - \frac{\theta}{\pi}\right]$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall?}
+\begin{itemize}
+\item With a single hash function $h$, the precision may be quite low; the recall quite high. 
+\item Just one hash may not be able to detect vectors that are indeed close by. So...
+\pause
+\item Several (independent) copies of the hash function $h$; call these $h_1, h_2, \cdots, h_k$.  
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall?}
+\begin{itemize}
+\item With $k$ hash functions, we have a $k$-bit binary string, corresponding to a vector $v$.
+\item Call this the \textit{hashcode} corresponding to the vector $v$ (denoted as $\hc(v)$). 
+\item For two vectors $a, b$: if $\hc(a) = \hc(b)$ bit-by-bit, then surely $a$ and $b$ are close. 
+\pause
+\item This would help in improving precision. But recall may suffer.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Precision? Recall? Two extremes}
+\begin{itemize}
+\item Given the hashcodes of the vectors, we can ask for a full bit-by-bit match to declare near duplicates. High precision, low recall.
+\item Given the hashcodes, we can ask for a \textit{single} bit match to declare near duplicates. High recall, low precision.
+\pause
+\item Mix the two: Banding. In the parlance of complexity theory, \tcr{gap amplification}.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig4}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig5}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Banding}
+\begin{itemize}
+\item An example with $k = 15$ hashes, where $\mathrm{rows} = 3$ and $\mathrm{bands} = 5$. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.5in]{fig6}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig7}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig8}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We show the $\hc$'s for $a$ and $b$:
+\end{itemize}
+\begin{center}
+\includegraphics[height=2.5in]{fig9}
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Are $a$ and $b$ near-duplicates?}
+\begin{itemize}
+\item We declare $a$ and $b$ as near duplicates, if \tcr{there is a \textit{band} in which they match bit-by-bit}. 
+\end{itemize}
+\begin{center}
+\includegraphics[height=1.7in]{fig9}
+\end{center}
+\pause
+\begin{itemize}
+\item To increase precision, increase the number of $\mathrm{rows}$. To increase recall, increase number of $\mathrm{bands}$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Still a flourishing/active area of research}
+\begin{itemize}
+\item Various considerations:
+\begin{itemize}
+\item Engineering aspects: hash table construction time, query times, etc. 
+\item Engineering aspects: Maintain hashbuckets, update hashes. Bloom filters for hash buckets, etc.
+\item How much randomness do I need?
+\item How do I improve recall while maintaining precision.
+\item Deep Hashing techniques?
+\item Which similarity measures work best for different content: text, images, video.
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Still a flourishing/active area of research}
+\begin{itemize}
+\item Improve \textit{recall} of $\lsh$ 
+\begin{itemize}
+\item covering $\lsh$ (only for Hamming space), (Pham-Pagh16)
+\item other similarity measures wide open.
+\end{itemize} 
+\item Develop $\lsh$'s for other similarity measures.
+\begin{itemize}
+\item Inner product (Neyshabur-Srebro15, Li-Shrivastava14)
+\item Also gave rise to Assymetric $\lsh$.
+\end{itemize}
+\item Improve training and query times based on data:
+\begin{itemize}
+\item Data Dependent Hashing (Andoni-Razenshteyn15)
+\item Learning to hash
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{LinkedIn's interest in finding near-duplicates}
+\begin{itemize}
+\item Do we like memes on our LinkedIn page? Puzzles?
+\end{itemize}
+\begin{center}
+\includegraphics[width=0.5\textwidth,height=1.5in]{Memes/philo1}
+\includegraphics[width=0.5\textwidth, height=1.5in]{Memes/philo5}
+\end{center}
+\begin{itemize}
+\item Spam Filtering: spammers often use the same text repeatedly to \textit{spam} members.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+Thank You!
+\end{center}\pause
+\begin{center}
+Questions?
+\end{center}
+\end{frame}
+
+\begin{frame}
+\frametitle{Formal definition of $\lsh$}
+\begin{itemize}
+\item A hash is said to be a $(S, cS, p_1, p_2)$-$\lsh$ for a similarity function $\si$ over the space 
+$\mathcal{X}$ if for any $x, y\in\mathcal{X}$:
+\begin{itemize}
+\item if $\si(x, y)\geqs S$ then $\Pr[h(x)=h(y)]\geqs p_1$.
+\item if $\si(x, y)\leqs cS$ then $\Pr[h(x)=h(y)]\leqs p_2$.
+\end{itemize}
+Here, $c \in (0, 1)$ \pause
+\item Read as: items that are ``highly'' similar land in the \tcb{same} hash-bucket with ``high'' probability, and items that are dissimilar land in the same hash bucket with ``low'' probability.
+\item Ideally we want: $p_1 = 1$, and $p_2 = 0$. These probabilities ``mirror'' the similarity function $\si(\cdot, \cdot)$.
+\end{itemize}
+\end{frame}
+
+\end{document} 
+
+
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{frame}
