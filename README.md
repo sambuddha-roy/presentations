@@ -18,3 +18,6 @@
 ### [Submodular Considerations for Graph Density](https://github.com/sambuddha-roy/presentations/blob/master/submodular-cmi-2010.pdf)
 * Invited Talk at Chennai Mathematical Institute (CMI), Chennai, India.
 * October 27, 2010.
+### [Scheduling Resources for Executing a Partial Set of Jobs]
+### [Contact Center Scheduling with Strict Resource Requirements](https://github.com/sambuddha-roy/presentations/blob/master/scheduling-ipco-2011.pdf)
+* Conference Talk at Integer Programming and Combinatorial Optimization (IPCO), 2011.
