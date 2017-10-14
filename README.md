@@ -1,5 +1,5 @@
 # Presentations
-### On Locality Sensitive Hashing 
+### [On Locality Sensitive Hashing](https://github.com/sambuddha-roy/presentations/blob/master/lsh-cods-mar-2016.pdf)
 * Invited Talk at CODS
 * March 16, 2016
 ### On Inequalities 
