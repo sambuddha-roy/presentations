@@ -22,5 +22,5 @@
 * October 27, 2010. 
 ### [Contact Center Scheduling with Strict Resource Requirements](https://github.com/sambuddha-roy/presentations/blob/master/scheduling-ipco-2011.pdf)
 * Conference Talk at Integer Programming and Combinatorial Optimization (IPCO), 2011.
-### [Resource Allocation for Covering Time Varying Demands]()
+### [Resource Allocation for Covering Time Varying Demands](https://github.com/sambuddha-roy/presentations/blob/master/scheduling-esa-2011.pdf)
 * Conference Talk at European Symposium of Algorithms (ESA), 2011.
