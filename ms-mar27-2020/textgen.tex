@@ -1,0 +1,81 @@
+\documentclass{beamer}
+\usetheme{umbc4}
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+\usepackage{amssymb}
+\usepackage{color}
+\include{samdefs}
+
+\usepackage{tikz,tkz-berge}
+\setbeamertemplate{background canvas}[vertical shading][bottom=green!20,top=yellow!30]
+\setbeamertemplate{itemize item}{\scriptsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+
+
+\title[Microsoft, March 27, 2020] % (optional, use only with long paper titles)
+{Understanding current text generation techniques}
+
+\author{Sambuddha Roy}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+\frametitle{Contents}
+\begin{itemize}
+\item Why inequalities?
+\item Used in: almost everywhere..
+\pause
+\begin{itemize}
+\item Approximation Algorithms \pause
+\item Optimization \pause
+\pause
+\item (Can almost be called the backbone of mathematics..)
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\frametitle{Inequality $2$: Use {\color{blue} blue} fact}
+\begin{block}{Facts}
+\begin{itemize}
+\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
+\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+\end{itemize}
+\end{block}
+\begin{itemize}
+\item Have: {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)}
+= |A|$}
+\item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
+\pause
+\item Separate out the vertices as $v\in V_1$ and $v\in V\backslash V_1$.
+\pause
+\item For $v \in V \backslash V_1$, $i(v)/d(v) < 1/3$. For $v \in V_1$, $i(v)/d(v) \leqs 1$.
+\item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) + \sum_{v\in V\backslash V_1} d(v)/3$}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}
+\begin{center}
+{\bf THANK YOU}
+\end{center}
+\end{frame}
+
+
+\end{document}
+
+
+\begin{frame}
+\frametitle{}
+\begin{itemize}
+\item
+\end{itemize}
+\end{frame}
