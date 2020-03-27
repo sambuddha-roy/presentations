@@ -1,4 +1,5 @@
-\documentclass{beamer}
+\documentclass[11pt]{beamer}
+\usefonttheme{serif}
 \usetheme{umbc4}
 \usepackage[english]{babel}
 \usepackage[latin1]{inputenc}
@@ -6,6 +7,10 @@
 \usepackage[T1]{fontenc}
 \usepackage{amssymb}
 \usepackage{color}
+\usepackage{graphicx}
+
+\definecolor{links}{HTML}{2A1B81}
+\hypersetup{colorlinks,linkcolor=,urlcolor=links}
 \include{samdefs}
 
 \usepackage{tikz,tkz-berge}
@@ -14,7 +19,7 @@
 
 
 \title[Microsoft, March 27, 2020] % (optional, use only with long paper titles)
-{Understanding current text generation techniques}
+{Current text generation techniques}
 
 \author{Sambuddha Roy}
 
@@ -25,42 +30,158 @@
 \end{frame}
 
 \begin{frame}
-\frametitle{Contents}
+  \frametitle{Roadmap}
 \begin{itemize}
-\item Why inequalities?
-\item Used in: almost everywhere..
-\pause
-\begin{itemize}
-\item Approximation Algorithms \pause
-\item Optimization \pause
-\pause
-\item (Can almost be called the backbone of mathematics..)
-\end{itemize}
+  \item Scope of problem: language generation.
+  \item Open ended/closed ended generation.
+  \item Main objectives of generation: modeling human language.
+  \item Previous approaches: how they optimize for one or the other of the objectives.
+  \item The approach of the \href{https://arxiv.org/pdf/1904.09751.pdf}{Nucleus sampling} paper.
 \end{itemize}
 \end{frame}
-
 
 
 \begin{frame}
-\frametitle{Inequality $2$: Use {\color{blue} blue} fact}
-\begin{block}{Facts}
+  \frametitle{Scope of problem}
+Overall topic: we are going to discuss language models. Specifically, how do we
+use language models to {\em generate} text? There are two aspects to such language models:
 \begin{itemize}
-\item {\color{red} $\sum_{v\in V} d(v) = 2|A|$}
-\item {\color{blue} $\sum_{v \in V} i(v) = |A|$}
+  \item training
+  \item inference
 \end{itemize}
-\end{block}
+Here, we are concerned with the second part - inference (i.e. decoding).
+\end{frame}
+
+\begin{frame}
+  \frametitle{Language Models}
+So... how does a language model work?
+It models the next token prediction process, i.e. maximizes likelihood of the next token.
+
+Can we use that for generating a sentence? Will the sentences be like "human" sentences?
+
+Natural way: use the context to generate next token (according to the likelihoods) then
+incorporate that token into the context, and continue.
+\end{frame}
+
+\begin{frame}
 \begin{itemize}
-\item Have: {\color{blue} $\sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)}
-= |A|$}
-\item Want to have: $\sum_{v\in V_1} d(v) \geqs |A|/3$.
-\pause
-\item Separate out the vertices as $v\in V_1$ and $v\in V\backslash V_1$.
-\pause
-\item For $v \in V \backslash V_1$, $i(v)/d(v) < 1/3$. For $v \in V_1$, $i(v)/d(v) \leqs 1$.
-\item {\color{blue} $|A| = \sum_{v \in V} d(v)\cdot\frac{i(v)}{d(v)} \leqs \sum_{v \in V_1} d(v) + \sum_{v\in V\backslash V_1} d(v)/3$}
+  \item This is also called an {\em auto-regressive} (AR) approach.
+  \item Here is a nice definition of ``auto-regressive'' from the XLNet paper:
+  \item AR language modeling factorizes the likelihood into a forward product
+\begin{center}
+$p(x) = \Pi_{t=1}^T p(x_t | x_{<t})$
+\end{center}
+and then a parametric model (e.g. a neural network) is trained to model each
+conditional distribution.
 \end{itemize}
 \end{frame}
 
+\begin{frame}
+  \frametitle{Main desiderata of Language Generation}
+There are two aspects to language generation:
+\begin{itemize}
+  \item Quality
+  \item Diversity
+\end{itemize}
+Human beings use language, while quality is a ``need'', diversity is a ``want''.
+
+We want to pack in information content in our language, and to this effect, we
+(as in humans) add in an ``element of surprise'' in our language.
+\end{frame}
+
+\begin{frame}
+  How do we attain {\em quality}?
+
+\begin{itemize}
+  \item
+  {\em Answer}: maximum likelihood decoding. Essentially greedy.
+  At least we can hope that the language generated will be
+  grammatical.
+\item
+  We essentially want the {\em sentence} that has the highest probability/likelihood
+  under the language model.
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  How do we obtain {\em diversity}?
+\begin{itemize}
+  \item
+  {\em Answer}: usually, by some kind of sampling.
+\item
+  I.e. We consider the probability distribution of the next token, and sample from that
+  distribution.
+\item
+  At least in this way, we are giving different candidates a chance (a step
+  in the direction of diversity)
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{The two extremes}
+  \begin{itemize}
+    \item Maximum likelihood decoding is perhaps too suboptimal. How about some
+    {\em approximations} to the actual optimum?
+    \item Enter Beam Search. At every step, you have a beam of candidate extensions.
+    \begin{itemize}
+    \item At the
+    end pick up the top k beams.
+    \item We will gloss over details: length normalization, etc.
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{images/prefix_probability_tree.png}
+\end{center}
+(Courtesy: \href{https://geekyisawesome.blogspot.com/2016/10/using-beam-search-to-generate-most.html}{geekyisawesome blog})
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{The two extremes}
+  \begin{itemize}
+    \item Sampling. While we do get diversity here, we sacrifice quality. Why?
+    \item If at some point there is a (slightly) heavy tail, and we end up sampling
+    a low-probability token (word), then that might steer the generated text
+    far away from optimum.
+    \item So how do we disincentivize sampling from the tail? A couple of approaches:
+    \begin{itemize}
+      \item Temperature $T$:
+      \begin{center}
+        $\mathrm{logits} \leftarrow \mathrm{logits}/{T}$
+      \end{center}
+      and imagine $T < 1$. Thin out the tail: {\em rich get richer} effect.
+      \item Top-$k$ sampling: fix $k$, send the probability mass of the tail (beyond the top $k$
+      probability tokens) to $0$.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Taking stock}
+  \begin{itemize}
+\item
+Ok... so we understand that sampling can get us diversity, perhaps we believe that it might cause
+a loss in quality.
+\pause
+\item
+But maybe Beam Search is good enough - it gets us quality, perhaps diversity too,
+right?
+\pause
+  \item Wrong.
+  \pause
+  \item Beam Search tends to keep repeating itself.
+\end{itemize}
+\end{frame}
+\begin{frame}
+  \frametitle{And some examples...}
+  \begin{itemize}
+    \item \href{https://github.com/minimaxir/gpt-2-simple/issues/51}{Example of nucleus sampling}
+  \end{itemize}
+\end{frame}
 
 
 \begin{frame}
@@ -69,8 +190,9 @@
 \end{center}
 \end{frame}
 
-
 \end{document}
+
+
 
 
 \begin{frame}
@@ -78,4 +200,36 @@
 \begin{itemize}
 \item
 \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{images/samples.png}
+\end{center}
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Nice papers we will cover - partially.}
+\begin{itemize}
+\item \href{https://arxiv.org/pdf/1904.09751.pdf}{Curious case of Neural De-generation (ICLR 2020) - Nucleus paper}
+\item \href{https://arxiv.org/abs/1908.04319}{Neural Text Generation with Unlikelihood Training}
+\item \href{https://arxiv.org/pdf/1904.02792.pdf}{Unifying human and statistical evaluation for natural language generation -- HUSE paper}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Good blogs that we will use}
+\begin{itemize}
+\item \href{https://huggingface.co/blog/how-to-generate}{huggingface blog}
+\item \href{https://medium.com/phrasee/neural-text-generation-generating-text-using-conditional-language-models-a37b69c7cd4b}{medium blog on text generation}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{And some examples...}
+  \begin{itemize}
+    \item \href{https://github.com/minimaxir/gpt-2-simple/issues/51}{Example of nucleus sampling}
+  \end{itemize}
 \end{frame}
