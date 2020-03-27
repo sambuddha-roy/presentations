@@ -77,16 +77,39 @@ conditional distribution.
 \end{frame}
 
 \begin{frame}
+  \frametitle{Aside}
+There is another lens to view language generation from:
+\begin{itemize}
+  \item closed ended language generation. Such as, machine translation, image captioning, etc.
+  (the paper calls this ``directed generation'')
+\pause
+  \item open ended language generation. Like for instance abstractive summarization, etc.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
   \frametitle{Main desiderata of Language Generation}
 There are two aspects to language generation:
 \begin{itemize}
   \item Quality
   \item Diversity
 \end{itemize}
-Human beings use language, while quality is a ``need'', diversity is a ``want''.
+Human beings use language:
+\begin{itemize}
+  \item while quality is a ``need'',
+  \item diversity is a ``want''.
+\end{itemize}
 
 We want to pack in information content in our language, and to this effect, we
 (as in humans) add in an ``element of surprise'' in our language.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Diversity is underrated}
+  Here is a surprising image from the paper:
+  \begin{center}
+  \includegraphics[height=0.9\textheight]{images/surprise.png}
+  \end{center}
 \end{frame}
 
 \begin{frame}
@@ -164,7 +187,7 @@ We want to pack in information content in our language, and to this effect, we
   \frametitle{Taking stock}
   \begin{itemize}
 \item
-Ok... so we understand that sampling can get us diversity, perhaps we believe that it might cause
+Ok... so we understand that sampling can get us diversity, perhaps we agree that it might cause
 a loss in quality.
 \pause
 \item
@@ -176,6 +199,58 @@ right?
   \item Beam Search tends to keep repeating itself.
 \end{itemize}
 \end{frame}
+
+\begin{frame}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{images/beamsearch-vs-samp.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{itemize}
+  \item  Is this all that surprising? Possible ways this can happen... \pause
+  \item (Very roughly), the language model tries to optimize the next token's fit
+  given the context - something like try to maximize inner product between the embeddings of
+  the token and that of the context, etc.
+  \item   So in the future, it is likely that one of the same tokens will again
+    emerge as the ``winner''.
+  \item This is a rough (and not entirely correct view), but helps us make some sense of
+  the {\em repetition problem}.
+  \item Part of the problem also is: we generate new text based not on ground truth
+  data (there might be none), but instead, based on other generated text.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Main idea of the paper: motivation}
+  \begin{itemize}
+    \item The main idea is easily derived from understanding failure modes of top-$k$ sampling.
+\item In top-$k$ sampling, we might still end up picking useless (low probability) candidate tokens.
+\item Depends on whether the next token distribution is {\em peaked} or {\em flat}
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{Peaked and flat distributions}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{images/peaked.png}
+\end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Main idea: top $p$ instead of top-$k$}
+  \begin{itemize}
+    \item Pick up the top candidates that together account for a probability mass of $\geqslant p$.
+    \item For these candidates, up-weight them, and then sample.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Over to the paper..}
+  The paper: \href{https://arxiv.org/abs/1904.09751}{Neural degeneration}
+\end{frame}
+
 \begin{frame}
   \frametitle{And some examples...}
   \begin{itemize}
