@@ -19,7 +19,7 @@
 
 
 \title[Microsoft, March 27, 2020] % (optional, use only with long paper titles)
-{Current text generation techniques}
+{Text Generation using Language Models: Nucleus sampling}
 
 \author{Sambuddha Roy}
 
@@ -36,7 +36,8 @@
   \item Open ended/closed ended generation.
   \item Main objectives of generation: modeling human language.
   \item Previous approaches: how they optimize for one or the other of the objectives.
-  \item The approach of the \href{https://arxiv.org/pdf/1904.09751.pdf}{Nucleus sampling} paper.
+  \item The approach of the \href{https://arxiv.org/pdf/1904.09751.pdf}{Nucleus sampling} paper:
+  {\em The Curious Case of Neural Text Degeneration}.
 \end{itemize}
 \end{frame}
 
@@ -105,7 +106,17 @@ We want to pack in information content in our language, and to this effect, we
 \end{frame}
 
 \begin{frame}
-  \frametitle{Diversity is underrated}
+  \frametitle{Diversity}
+  Note that there can be two different concepts of diversity:
+  \begin{itemize}
+    \item Diversity of vocabulary, within a single sample.
+    \item Diversity across multiple samples.
+  \end{itemize}
+  In this paper, the authors mostly consider the first notion of diversity.
+\end{frame}
+
+\begin{frame}
+  \frametitle{Is diversity underrated?}
   Here is a surprising image from the paper:
   \begin{center}
   \includegraphics[height=0.9\textheight]{images/surprise.png}
