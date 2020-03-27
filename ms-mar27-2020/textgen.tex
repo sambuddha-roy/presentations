@@ -248,8 +248,52 @@ right?
 
 \begin{frame}
   \frametitle{Over to the paper..}
-  The paper: \href{https://arxiv.org/abs/1904.09751}{Neural degeneration}
+What metrics does the
+ \href{https://arxiv.org/abs/1904.09751}{Neural degeneration paper} consider?
+  \begin{itemize}
+\item For the likelihood evaluation, compute {\bf perplexity} (being vague: the amount of {\em confusion} in the model)
+\pause
+\item Important takeaway: it is not enough to ``minimize'' perplexity but to target the perplexity of
+the ground truth (section 4.3)
+  \end{itemize}
 \end{frame}
+
+\begin{frame}
+  \frametitle{Some takeaways...}
+  \begin{itemize}
+    \item Very well written paper, easy read! Clear motivations.
+    \pause
+    \item Some more possibilities could have been explored (discuss):
+    \begin{itemize}
+      \item This paper considers GPT2 as the language model since GPT2 had shown
+      remarkable prowess in generating stories.
+      \item From the \href{https://openai.com/blog/better-language-models/}{OpenAI} website, they use truncated top-$k$ sampling.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Some takeaways...}
+    \begin{itemize}
+      \item Borrow top $p$ into Beam Search - do not use a uniform beam width of size $b$ but
+      vary that according to $p$. Will this make the diversity problem worse? Not clear..
+      \pause
+      \item Other ways of ensuring diversity: every token ``generates'' a repulsive field around itself
+      and prevents the same token from being generated again.
+      \pause
+      \item (such ideas abound in the web search world. For example \href{https://arxiv.org/pdf/1203.6397.pdf}{this paper} uses submodular maximization to ensure diversity of search results)
+      \item Of course, not the token itself, but its embedding.
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}
+\begin{center}
+{\em THANK YOU}
+\end{center}
+\end{frame}
+
+\end{document}
 
 \begin{frame}
   \frametitle{And some examples...}
@@ -257,17 +301,6 @@ right?
     \item \href{https://github.com/minimaxir/gpt-2-simple/issues/51}{Example of nucleus sampling}
   \end{itemize}
 \end{frame}
-
-
-\begin{frame}
-\begin{center}
-{\bf THANK YOU}
-\end{center}
-\end{frame}
-
-\end{document}
-
-
 
 
 \begin{frame}
